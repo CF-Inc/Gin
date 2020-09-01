@@ -18,20 +18,15 @@
       "runner": "@nrwl/nx-cloud",
       "options": {
         "accessToken": "NWIyNDViOTgtYzUxNS00NGUyLTgzMDQtNmE0MjY4ZTc3ODIyfHJlYWQtd3JpdGU=",
-        "cacheableOperations": [
-          "build",
-          "test",
-          "lint",
-          "e2e"
-        ],
+        "cacheableOperations": ["build", "test", "lint", "e2e"],
         "canTrackAnalytics": false,
         "showUsageWarnings": true
       }
     }
   },
-  "projects": {},
-  "workspaceLayout": {
-    "appsDir": "packages",
-    "libsDir": "packages"
+  "projects": {
+    "gin": {
+      "tags": []
+    }
   }
 }

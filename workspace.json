@@ -1,7 +1,64 @@
 {
   "version": 1,
-  "projects": {},
+  "projects": {
+    "gin": {
+      "root": "apps/gin",
+      "sourceRoot": "apps/gin/src",
+      "projectType": "application",
+      "prefix": "gin",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "options": {
+            "outputPath": "dist/apps/gin",
+            "main": "apps/gin/src/main.ts",
+            "tsConfig": "apps/gin/tsconfig.app.json",
+            "assets": ["apps/gin/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/gin/src/environments/environment.ts",
+                  "with": "apps/gin/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "gin:build"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "apps/gin/tsconfig.app.json",
+              "apps/gin/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!apps/gin/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/gin/jest.config.js",
+            "tsConfig": "apps/gin/tsconfig.spec.json",
+            "passWithNoTests": true
+          }
+        }
+      }
+    }
+  },
   "cli": {
-    "defaultCollection": "@nrwl/workspace"
-  }
+    "defaultCollection": "@nrwl/nest"
+  },
+  "defaultProject": "gin"
 }
