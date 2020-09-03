@@ -53,6 +53,18 @@
             "tsConfig": "apps/gin/tsconfig.spec.json",
             "passWithNoTests": true
           }
+        },
+        "generate": {
+          "builder": "@nx-tools/nx-prisma:generate",
+          "options": {
+            "schema": "apps/gin/data/schema.prisma"
+          }
+        },
+        "migrations": {
+          "builder": "@nx-tools/nx-prisma:migrations",
+          "options": {
+            "schema": "apps/gin/data/schema.prisma"
+          }
         }
       }
     }
