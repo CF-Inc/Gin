@@ -10,11 +10,12 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     super();
   }
 
-  public async validate(username: string, password: string) {
+  public async validate(username: string, password: string): Promise<any> {
     const user = await this.prisma.user.findOne({ where: { username } });
 
     if (user?.password === password) {
-      const { password: _, ...paswordlessUser } = user;
+      const { password: _discardedPassword, ...paswordlessUser } = user;
+
       return paswordlessUser;
     }
   }

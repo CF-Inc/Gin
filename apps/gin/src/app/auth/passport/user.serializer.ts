@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PassportSerializer } from '@nestjs/passport';
 
-let REPLACE_ME;
+let replaceMe: any;
 
 @Injectable()
 export class UserSerializer extends PassportSerializer {
@@ -9,12 +9,14 @@ export class UserSerializer extends PassportSerializer {
     super();
   }
 
-  public serializeUser(user, done: CallableFunction) {
-    REPLACE_ME = user;
-    done(undefined, 0);
+  @Override()
+  public deserializeUser(_userId: string, done: CallableFunction): void {
+    done(undefined, replaceMe);
   }
 
-  public async deserializeUser(userId: string, done: CallableFunction) {
-    done(undefined, REPLACE_ME);
+  @Override()
+  public serializeUser(user: any, done: CallableFunction): void {
+    replaceMe = user;
+    done(undefined, 0);
   }
 }
