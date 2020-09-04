@@ -3,20 +3,20 @@ import {
   Controller,
   Get,
   Post,
-  Request,
+  Redirect,
   UseGuards,
 } from '@nestjs/common';
-import { User } from '@prisma/client';
 
-import { PrismaService } from '../core/prisma.service';
-
+import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
+import { User } from './decorators/user.decorator';
 import { LoginGuard } from './guards/login.guard';
-import { RegisterDTO } from './models/register.dto';
+import { RegisterDTO } from './models/dtos';
+import type { IActiveUser } from './models/interfaces';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly service: AuthService) {}
 
   @Public()
   @Post('login')
@@ -27,17 +27,13 @@ export class AuthController {
 
   @Public()
   @Post('register')
-  public async register(
-    @Body() data: RegisterDTO
-  ): Promise<Pick<User, 'id' | 'username'>> {
-    return this.prisma.user.create({
-      data,
-      select: { id: true, username: true },
-    });
+  @Redirect('login', 308)
+  public async register(@Body() data: RegisterDTO): Promise<void> {
+    await this.service.register(data);
   }
 
   @Get('user')
-  public user(@Request() req: any): { message: string } {
-    return { message: `Welcome back ${req.user.username}` };
+  public user(@User() user: IActiveUser): IActiveUser {
+    return user;
   }
 }
