@@ -2,8 +2,10 @@ import {
   Body,
   Controller,
   Get,
+  InternalServerErrorException,
   Post,
   Redirect,
+  Session,
   UseGuards,
 } from '@nestjs/common';
 
@@ -23,6 +25,23 @@ export class AuthController {
   @UseGuards(LoginGuard)
   public login(): { message: string } {
     return { message: 'Welcome to the wonderful world of being logged in!' };
+  }
+
+  @Post('logout')
+  public async logout(@Session() session: Express.Session): Promise<void> {
+    try {
+      await new Promise((resolve, reject) =>
+        session.destroy((err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        })
+      );
+    } catch {
+      throw new InternalServerErrorException();
+    }
   }
 
   @Public()
