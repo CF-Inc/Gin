@@ -21,7 +21,8 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {},
+    "plugins": [{ "name": "typescript-tslint-plugin" }]
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
