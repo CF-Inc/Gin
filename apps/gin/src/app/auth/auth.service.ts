@@ -18,6 +18,7 @@ export class AuthService {
   ): Promise<IActiveUser | null> {
     return this.prisma.user.findOne({
       where,
+      select: { id: true, username: true },
     });
   }
 
