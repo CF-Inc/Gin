@@ -7,7 +7,7 @@
         "path": {
           "tag": "Field",
           "model": "User",
-          "field": "id"
+          "field": "gameScore"
         },
         "directive": "default"
       }
@@ -19,12 +19,12 @@
         "path": {
           "tag": "Field",
           "model": "User",
-          "field": "id"
+          "field": "gameScore"
         },
         "directive": "default"
       },
       "argument": "",
-      "value": "cuid()"
+      "value": "0"
     }
   ]
 }
