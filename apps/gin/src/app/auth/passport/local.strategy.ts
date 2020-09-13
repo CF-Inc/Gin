@@ -2,21 +2,19 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 
-import { PrismaService } from '../../core/prisma.service';
+import { AuthService } from '../auth.service';
+import type { IActiveUser } from '../models/interfaces';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly prisma: PrismaService) {
+  constructor(private readonly auth: AuthService) {
     super();
   }
 
-  public async validate(username: string, password: string): Promise<any> {
-    const user = await this.prisma.user.findOne({ where: { username } });
-
-    if (user?.password === password) {
-      const { password: _discardedPassword, ...paswordlessUser } = user;
-
-      return paswordlessUser;
-    }
+  public async validate(
+    username: string,
+    password: string
+  ): Promise<IActiveUser | null> {
+    return this.auth.validateUser(username, password);
   }
 }
