@@ -1,20 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { PassportSerializer } from '@nestjs/passport';
 
-let REPLACE_ME;
+import { AuthService } from '../auth.service';
+import type { IActiveUser } from '../models/interfaces';
 
 @Injectable()
 export class UserSerializer extends PassportSerializer {
-  constructor() {
+  constructor(private readonly auth: AuthService) {
     super();
   }
 
-  public serializeUser(user, done: CallableFunction) {
-    REPLACE_ME = user;
-    done(undefined, 0);
+  @Override()
+  public async deserializeUser(
+    id: string,
+    done: CallableFunction
+  ): Promise<void> {
+    const user = await this.auth.findUser({ id });
+    done(undefined, user);
   }
 
-  public async deserializeUser(userId: string, done: CallableFunction) {
-    done(undefined, REPLACE_ME);
+  @Override()
+  public serializeUser(user: IActiveUser, done: CallableFunction): void {
+    done(undefined, user.id);
   }
 }

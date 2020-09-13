@@ -1,40 +1,58 @@
 import {
-  Controller,
-  Post,
-  UseGuards,
-  Request,
-  Get,
   Body,
+  Controller,
+  Get,
+  InternalServerErrorException,
+  Post,
+  Redirect,
+  Session,
+  UseGuards,
 } from '@nestjs/common';
-import type { Request as Req } from 'express';
 
+import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
+import { User } from './decorators/user.decorator';
 import { LoginGuard } from './guards/login.guard';
-import { PrismaService } from '../core/prisma.service';
-import { RegisterDTO } from './models/register.dto';
+import { RegisterDTO } from './models/dtos';
+import type { IActiveUser } from './models/interfaces';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly prisma: PrismaService) {}
-
-  @Public()
-  @Post('register')
-  public async register(@Body() data: RegisterDTO) {
-    return this.prisma.user.create({
-      data,
-      select: { id: true, username: true },
-    });
-  }
+  constructor(private readonly service: AuthService) {}
 
   @Public()
   @Post('login')
   @UseGuards(LoginGuard)
-  public login() {
+  public login(): { message: string } {
     return { message: 'Welcome to the wonderful world of being logged in!' };
   }
 
+  @Post('logout')
+  public async logout(@Session() session: Express.Session): Promise<void> {
+    try {
+      await new Promise((resolve, reject) =>
+        session.destroy((err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        })
+      );
+    } catch {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  @Public()
+  @Post('register')
+  @Redirect('login', 308)
+  public async register(@Body() data: RegisterDTO): Promise<void> {
+    await this.service.register(data);
+  }
+
   @Get('user')
-  public user(@Request() req) {
-    return { message: `Welcome back ${req.user.username}` };
+  public user(@User() user: IActiveUser): IActiveUser {
+    return user;
   }
 }
