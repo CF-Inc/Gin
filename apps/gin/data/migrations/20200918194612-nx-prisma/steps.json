@@ -1,0 +1,146 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "hostedGame",
+      "type": "Game",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "hostedGame"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "hostedGame"
+        },
+        "directive": "relation"
+      },
+      "argument": "",
+      "value": "\"host\""
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "hostedGame"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[hostedGameId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "hostedGame"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "hostedGameId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "game"
+        },
+        "directive": "relation"
+      },
+      "argument": "name",
+      "value": "\"users\""
+    },
+    {
+      "tag": "CreateField",
+      "model": "Game",
+      "field": "name",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Game",
+      "field": "host",
+      "type": "User",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Game",
+          "field": "host"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Game",
+          "field": "host"
+        },
+        "directive": "relation"
+      },
+      "argument": "name",
+      "value": "\"host\""
+    },
+    {
+      "tag": "CreateField",
+      "model": "Game",
+      "field": "hostId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Game",
+          "field": "users"
+        },
+        "directive": "relation"
+      },
+      "argument": "name",
+      "value": "\"users\""
+    }
+  ]
+}

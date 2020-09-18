@@ -54,7 +54,7 @@
             "passWithNoTests": true
           }
         },
-        "generate": {
+        "db-generate": {
           "builder": "@nx-tools/nx-prisma:generate",
           "options": {
             "schema": "apps/gin/data/schema.prisma"
