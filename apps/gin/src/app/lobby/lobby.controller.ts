@@ -1,41 +1,41 @@
 import {
   Controller,
-  Get,
-  Post,
   Delete,
-  Put,
-  Param,
-  Redirect,
-  Res,
+  Get,
   NotFoundException,
+  Param,
+  Post,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Game } from '@prisma/client';
 
-import { PrismaService } from '../core/prisma.service';
 import { User } from '../auth/decorators/user.decorator';
 import { ActiveUser } from '../auth/models/active-user';
+import { PrismaService } from '../core/prisma.service';
+import { ILobby } from '../models/lobby';
+import { ILobbyDetails } from '../models/lobby-details';
+import { IMessage } from '../models/message';
 
 @Controller('lobby')
 export class LobbyController {
   constructor(private readonly prisma: PrismaService) {}
 
   @Get()
-  public async listLobbies() {
+  public async listLobbies(): Promise<ILobby[]> {
     const games = await this.prisma.game.findMany({
       select: { name: true, id: true, users: true },
     });
 
-    const lobbies = games.map((game) => ({
+    return games.map((game) => ({
       name: game.name,
       id: game.id,
       playerCount: game.users.length,
     }));
-
-    return lobbies;
   }
 
   @Get(':id')
-  public async lobbyDetails(@Param('id') gameId: string) {
+  public async lobbyDetails(
+    @Param('id') gameId: string
+  ): Promise<ILobbyDetails | null> {
     const lobby = await this.prisma.game.findOne({
       where: { id: gameId },
       select: {
@@ -44,18 +44,20 @@ export class LobbyController {
       },
     });
 
-    return {
-      ...lobby,
-      users: lobby.users.map(({ id, hostedGameId, username }) => ({
-        id,
-        username,
-        host: !!hostedGameId,
-      })),
-    };
+    return lobby !== null
+      ? {
+          ...lobby,
+          users: lobby.users.map(({ id, hostedGameId, username }) => ({
+            id,
+            username,
+            host: Boolean(hostedGameId),
+          })),
+        }
+      : null;
   }
 
   @Post()
-  public async addLobby(@User() user: ActiveUser) {
+  public async addLobby(@User() user: ActiveUser): Promise<Pick<Game, 'id'>> {
     await this.deleteLobby(user);
     const { username } = user;
 
@@ -73,17 +75,20 @@ export class LobbyController {
       data: { gameHand: { set: [] }, gameScore: { set: 0 } },
     });
 
-    return { lobby };
+    return lobby;
   }
 
   @Post(':id/join')
-  public async joinLobby(@User() user: ActiveUser, @Param('id') id: string) {
+  public async joinLobby(
+    @User() user: ActiveUser,
+    @Param('id') id: string
+  ): Promise<IMessage> {
     await this.deleteLobby(user);
     const lobby = await this.prisma.game.findOne({
       where: { id },
     });
 
-    if (lobby) {
+    if (lobby !== null) {
       await this.prisma.user.update({
         where: { username: user.username },
         data: {
@@ -100,9 +105,8 @@ export class LobbyController {
   }
 
   @Post('/leave')
-  @Redirect()
-  public async leaveLobby(@User() user: ActiveUser, @Res() res: Response) {
-    if (!user.hostedGameId) {
+  public async leaveLobby(@User() user: ActiveUser): Promise<IMessage> {
+    if (user.hostedGameId !== null) {
       await this.prisma.user.update({
         where: { username: user.username },
         data: { game: { disconnect: true } },
@@ -115,8 +119,10 @@ export class LobbyController {
   }
 
   @Delete()
-  public async deleteLobby(@User() { hostedGameId }: ActiveUser) {
-    if (hostedGameId) {
+  public async deleteLobby(
+    @User() { hostedGameId }: ActiveUser
+  ): Promise<IMessage> {
+    if (typeof hostedGameId === 'string') {
       await this.prisma.user.updateMany({
         where: { gameId: hostedGameId },
         data: {
@@ -130,20 +136,19 @@ export class LobbyController {
         select: { id: true },
       });
 
-      if (users.length) {
+      if (users.length)
         await this.prisma.game.update({
           where: { id: hostedGameId },
           data: {
             users: { disconnect: users },
           },
         });
-      }
 
       await this.prisma.game.delete({ where: { id: hostedGameId } });
 
       return { message: 'You have obliterated the lobby' };
     }
 
-    return { message: 'The lobby is a lie' };
+    throw new NotFoundException('The lobby is a lie');
   }
 }
