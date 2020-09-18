@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = "***"
 }
 
 model User {
@@ -26,11 +26,4 @@ model Game {
   users   User[]   @relation(name: "users")
   deck    String[]
   discard String[]
-}
-
-model Session {
-  id      String   @id
-  sid     String   @unique
-  data    String
-  expires DateTime
 }

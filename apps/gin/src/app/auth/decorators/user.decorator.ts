@@ -3,13 +3,15 @@ import {
   ExecutionContext,
   ForbiddenException,
 } from '@nestjs/common';
-import type { Request } from 'express';
+import { Request } from 'express';
+
+import { ActiveUser } from '../models/active-user';
 
 export const User = createParamDecorator(
-  (_data: unknown, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest<Request>();
-    if (!request.user) throw new ForbiddenException();
+  (_data: unknown, context: ExecutionContext): ActiveUser => {
+    const { user } = context.switchToHttp().getRequest<Request>();
+    if (!user) throw new ForbiddenException();
 
-    return request.user;
+    return user as ActiveUser;
   }
 );
